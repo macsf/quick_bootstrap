@@ -195,8 +195,17 @@ gulp.task('replaceHtmlBlock', () => {
     .src(['./src/*.{html,php}'])
     .pipe(
       htmlreplace({
-        js: ['/js/script.min.js'],
-        css: ['/css/style.min.css']
+        js: [
+          '/js/vendor/jquery.slim.min.js',
+          '/js/vendor/popper.min.js',
+          '/js/vendor/bootstrap.min.js',
+          '/js/script.min.js'
+        ],
+        css: [
+          '/fonts/font-awesome/css/font-awesome.css',
+          '/css/bootstrap.min.css',
+          '/css/style.min.css'
+        ]
       })
     )
     .pipe(gulp.dest('./dist'));
@@ -226,7 +235,13 @@ gulp.task('dev', done => {
       done();
     })
   );
-  gulp.watch(['./src/*.{html,php}']).on('change', browserSync.reload);
+  gulp.watch(
+    ['./src/*.{html,php}', './src/favicon*.*', './src/img/**'],
+    gulp.series('replaceHtmlBlock', done => {
+      browserSync.reload();
+      done();
+    })
+  );
   done();
 });
 
@@ -255,4 +270,4 @@ gulp.task(
 
 // Default task
 gulp.task('default', gulp.series('clean', 'build', 'replaceHtmlBlock'));
-gulp.task('serve', gulp.series('clean', 'build', 'dev'));
+gulp.task('serve', gulp.series('clean', 'build', 'replaceHtmlBlock', 'dev'));
